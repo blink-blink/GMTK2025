@@ -1,0 +1,52 @@
+[gd_scene load_steps=4 format=3 uid="uid://c2p821bgegxi6"]
+
+[ext_resource type="Script" uid="uid://cxy84ala2gkh5" path="res://organism.gd" id="1_5rwh6"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5rwh6"]
+radius = 10.198039
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mgi51"]
+radius = 22.022715
+
+[node name="Organism" type="Area2D"]
+collision_mask = 0
+script = ExtResource("1_5rwh6")
+
+[node name="Sprite" type="Node2D" parent="."]
+
+[node name="ActionTimer" type="Timer" parent="."]
+wait_time = 0.9750534034493092
+one_shot = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_5rwh6")
+
+[node name="InteractionArea" type="Area2D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+shape = SubResource("CircleShape2D_mgi51")
+
+[node name="AncestorLabel" type="Label" parent="."]
+visible = false
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -42.0
+offset_right = 20.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+
+[node name="NourishmentLabel" type="Label" parent="."]
+visible = false
+anchors_preset = -1
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+
+[connection signal="timeout" from="ActionTimer" to="." method="_on_action_timer_timeout"]

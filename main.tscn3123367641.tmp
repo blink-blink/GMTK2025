@@ -1,0 +1,125 @@
+[gd_scene load_steps=6 format=3 uid="uid://b12mgldnbdwad"]
+
+[ext_resource type="Script" uid="uid://hr0di1boicyx" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Texture2D" uid="uid://bhlywlfnvw7jf" path="res://icon.svg" id="2_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://c6frct0n1t47a" path="res://planet.png" id="2_h2yge"]
+
+[sub_resource type="Gradient" id="Gradient_h2yge"]
+offsets = PackedFloat32Array(0.17299578, 0.3586498, 0.5063291, 0.6666667, 0.8691983)
+colors = PackedColorArray(0.14, 0.15299992, 0.4, 1, 0.41842508, 0.22050002, 0.63, 1, 1, 0.58000004, 0.5869999, 1, 0.59000003, 0.8975, 1, 1, 1, 0.99333334, 0.96, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1bvp3"]
+gradient = SubResource("Gradient_h2yge")
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("planet")]
+script = ExtResource("1_ig7tw")
+planet = NodePath("Planet")
+
+[node name="Celestials" type="Sprite2D" parent="."]
+position = Vector2(542.5001, 355.00003)
+scale = Vector2(29.859375, 25.40625)
+texture = SubResource("GradientTexture2D_1bvp3")
+
+[node name="Planet" type="Marker2D" parent="."]
+position = Vector2(576, 328)
+
+[node name="Sprite" type="Sprite2D" parent="Planet"]
+position = Vector2(2.0980835e-05, 1.7166138e-05)
+scale = Vector2(0.399, 0.395)
+texture = ExtResource("2_h2yge")
+
+[node name="Organisms" type="Node2D" parent="."]
+
+[node name="UserInterface" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UserInterface"]
+anchors_preset = -1
+anchor_left = 0.98
+anchor_top = 0.5
+anchor_right = 0.98
+anchor_bottom = 0.5
+offset_left = -161.0
+offset_top = -286.0
+offset_bottom = 286.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UserInterface/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 31
+text = "Organisms"
+horizontal_alignment = 1
+
+[node name="OrganismList" type="VBoxContainer" parent="UserInterface/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ScoreLabel" type="Label" parent="UserInterface"]
+anchors_preset = -1
+offset_left = 33.0
+offset_top = 26.0
+offset_right = 239.0
+offset_bottom = 83.0
+theme_override_font_sizes/font_size = 41
+text = "Score: 0"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="UserInterface"]
+anchors_preset = -1
+offset_left = 41.0
+offset_top = 122.0
+offset_right = 227.0
+offset_bottom = 352.0
+
+[node name="OrgTypesLabel" type="Label" parent="UserInterface/VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="UserInterface"]
+anchors_preset = -1
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -128.0
+offset_right = 392.0
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="UserInterface/VBoxContainer2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "DISASTERS"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UserInterface/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TextureButton" type="TextureButton" parent="UserInterface/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("2_0xm2m")
+stretch_mode = 0
+
+[node name="TextureButton2" type="TextureButton" parent="UserInterface/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("2_0xm2m")
+stretch_mode = 0
+
+[node name="TextureButton3" type="TextureButton" parent="UserInterface/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("2_0xm2m")
+stretch_mode = 0
+
+[node name="DaysLabel" type="Label" parent="UserInterface"]
+unique_name_in_owner = true
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 71.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 36
+text = "DAY 0"
+
+[connection signal="organism_death" from="." to="." method="_on_organism_death"]
+[connection signal="organism_position_updated" from="." to="." method="_on_organism_position_updated"]
+[connection signal="organism_reproduced" from="." to="." method="_on_organism_reproduced"]

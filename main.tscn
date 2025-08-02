@@ -1,0 +1,230 @@
+[gd_scene load_steps=18 format=3 uid="uid://b12mgldnbdwad"]
+
+[ext_resource type="Script" uid="uid://hr0di1boicyx" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Texture2D" uid="uid://bhlywlfnvw7jf" path="res://icon.svg" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://dw85ydmx5fwft" path="res://camera.gd" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="3_7mycd"]
+[ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="4_272bh"]
+[ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="5_5vw27"]
+[ext_resource type="Script" uid="uid://ctw5bwg7kyj4b" path="res://organism_spawner.gd" id="6_272bh"]
+
+[sub_resource type="Gradient" id="Gradient_h2yge"]
+offsets = PackedFloat32Array(0.17299578, 0.43037975, 0.51054853, 0.5864979, 0.8691983)
+colors = PackedColorArray(0.14, 0.15299992, 0.4, 1, 0.41842508, 0.22050002, 0.63, 1, 1, 0.58000004, 0.5869999, 1, 0.59000003, 0.8975, 1, 1, 1, 0.99333334, 0.96, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1bvp3"]
+gradient = SubResource("Gradient_h2yge")
+
+[sub_resource type="Curve2D" id="Curve2D_kek77"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 123.45176, 230.91432, 0, 127.53398, 0, -127.53398, 0, 0, 223.52301, 0, 123.45176, 0, -123.45176, -230.91432, 0, -127.53398, 0, 127.53398, 0, 0, -223.52301, 0, -123.45176, 0, 0, 230.91432, 0)
+}
+point_count = 5
+
+[sub_resource type="Resource" id="Resource_4c57u"]
+script = ExtResource("5_5vw27")
+
+[sub_resource type="Gradient" id="Gradient_efxa6"]
+offsets = PackedFloat32Array(0.85382116, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_dg77c"]
+gradient = SubResource("Gradient_efxa6")
+width = 461
+height = 447
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.97752166, 0.6486876)
+
+[sub_resource type="Curve2D" id="Curve2D_ycdy4"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 108.2508, 196, 0, 108.2508, 0, -108.2508, 0, 0, 196, 0, 108.2508, 0, -108.2508, -196, 0, -108.2508, 0, 108.2508, 0, 0, -196, 0, -108.2508, 0, 0, 196, 0)
+}
+point_count = 5
+
+[sub_resource type="Resource" id="Resource_w48qg"]
+script = ExtResource("5_5vw27")
+
+[sub_resource type="Gradient" id="Gradient_7mycd"]
+offsets = PackedFloat32Array(0.88999194, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.14, 0.14, 0.14, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_272bh"]
+gradient = SubResource("Gradient_7mycd")
+width = 392
+height = 392
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.9775216, 0.64868754)
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("planet")]
+script = ExtResource("1_ig7tw")
+planet = NodePath("Planet")
+planet_radius = 190.0
+
+[node name="Camera" type="Camera2D" parent="." node_paths=PackedStringArray("camera_target")]
+position = Vector2(576, 328)
+position_smoothing_enabled = true
+position_smoothing_speed = 7.0
+script = ExtResource("2_1bvp3")
+camera_target = NodePath("../Planet")
+
+[node name="Celestials" type="Sprite2D" parent="."]
+position = Vector2(542.5001, 355.00003)
+scale = Vector2(50, 42.543)
+texture = SubResource("GradientTexture2D_1bvp3")
+
+[node name="Planet" type="Node2D" parent="."]
+position = Vector2(576, 328)
+
+[node name="Plants" type="Node2D" parent="Planet"]
+unique_name_in_owner = true
+position = Vector2(-576, -328)
+
+[node name="Fog" type="Node2D" parent="Planet" node_paths=PackedStringArray("polygon")]
+modulate = Color(18.892, 18.892, 18.892, 1)
+script = ExtResource("3_7mycd")
+polygon = NodePath("Fill")
+curve = SubResource("Curve2D_kek77")
+arc_list = SubResource("Resource_4c57u")
+shape_type = 2
+size = Vector2(461.82864, 447.04602)
+rx = 230.91432
+ry = 223.52301
+
+[node name="Fill" type="Polygon2D" parent="Planet/Fog"]
+color = Color(1, 1, 1, 0.41568628)
+texture = SubResource("GradientTexture2D_dg77c")
+texture_offset = Vector2(230.91432, 223.52301)
+polygon = PackedVector2Array(230.91432, 0, 229.72217, 22.85449, 226.2231, 45.04866, 220.53317, 66.47017, 212.76842, 87.006676, 203.04492, 106.54585, 191.47871, 124.975334, 178.18585, 142.1828, 163.28241, 158.05591, 146.88441, 172.48233, 129.10794, 185.3497, 110.069046, 196.54567, 89.88376, 205.95795, 68.66817, 213.47415, 46.538303, 218.98196, 23.61023, 222.36903, 0, 223.52301, -23.610228, 222.36903, -46.538303, 218.98195, -68.66817, 213.47415, -89.883766, 205.95795, -110.06904, 196.54567, -129.10794, 185.3497, -146.88441, 172.48232, -163.28241, 158.05591, -178.18585, 142.1828, -191.47871, 124.975334, -203.04492, 106.54585, -212.76843, 87.006676, -220.53317, 66.47017, -226.22311, 45.04866, -229.72217, 22.854492, -230.91432, 0, -229.72217, -22.85449, -226.2231, -45.04866, -220.53317, -66.47017, -212.76842, -87.006676, -203.04492, -106.54585, -191.47871, -124.975334, -178.18585, -142.1828, -163.28241, -158.05591, -146.88441, -172.48233, -129.10794, -185.3497, -110.069046, -196.54567, -89.88376, -205.95795, -68.66817, -213.47415, -46.538303, -218.98196, -23.61023, -222.36903, 0, -223.52301, 23.610228, -222.36903, 46.538303, -218.98195, 68.66817, -213.47415, 89.883766, -205.95795, 110.06904, -196.54567, 129.10794, -185.3497, 146.88441, -172.48232, 163.28241, -158.05591, 178.18585, -142.1828, 191.47871, -124.975334, 203.04492, -106.54585, 212.76843, -87.006676, 220.53317, -66.47017, 226.22311, -45.04866, 229.72217, -22.854492)
+metadata/_edit_lock_ = true
+
+[node name="Main" type="Node2D" parent="Planet" node_paths=PackedStringArray("polygon")]
+script = ExtResource("3_7mycd")
+polygon = NodePath("Fill")
+curve = SubResource("Curve2D_ycdy4")
+arc_list = SubResource("Resource_w48qg")
+shape_type = 2
+size = Vector2(392, 392)
+rx = 196.0
+ry = 196.0
+
+[node name="Fill" type="Polygon2D" parent="Planet/Main"]
+texture = SubResource("GradientTexture2D_272bh")
+texture_offset = Vector2(196, 196)
+polygon = PackedVector2Array(196, 0, 194.98811, 20.040354, 192.0181, 39.501694, 187.18848, 58.285515, 180.59776, 76.293304, 172.34445, 93.42656, 162.52707, 109.58678, 151.2441, 124.675446, 138.59406, 138.59406, 124.675446, 151.2441, 109.58678, 162.52707, 93.42657, 172.34445, 76.293304, 180.59778, 58.285515, 187.18848, 39.501694, 192.0181, 20.040354, 194.9881, 0, 196, -20.040354, 194.98811, -39.501694, 192.0181, -58.285515, 187.18848, -76.293304, 180.59776, -93.42656, 172.34445, -109.58678, 162.52707, -124.675446, 151.2441, -138.59406, 138.59406, -151.2441, 124.675446, -162.52707, 109.58678, -172.34445, 93.42657, -180.59778, 76.293304, -187.18848, 58.285515, -192.0181, 39.501694, -194.9881, 20.040354, -196, 0, -194.98811, -20.040354, -192.0181, -39.501694, -187.18848, -58.285515, -180.59776, -76.293304, -172.34445, -93.42656, -162.52707, -109.58678, -151.2441, -124.675446, -138.59406, -138.59406, -124.675446, -151.2441, -109.58678, -162.52707, -93.42657, -172.34445, -76.293304, -180.59778, -58.285515, -187.18848, -39.501694, -192.0181, -20.040354, -194.9881, 0, -196, 20.040354, -194.98811, 39.501694, -192.0181, 58.285515, -187.18848, 76.293304, -180.59776, 93.42656, -172.34445, 109.58678, -162.52707, 124.675446, -151.2441, 138.59406, -138.59406, 151.2441, -124.675446, 162.52707, -109.58678, 172.34445, -93.42657, 180.59778, -76.293304, 187.18848, -58.285515, 192.0181, -39.501694, 194.9881, -20.040354)
+metadata/_edit_lock_ = true
+
+[node name="Organisms" type="Node2D" parent="Planet"]
+unique_name_in_owner = true
+position = Vector2(-576, -328)
+
+[node name="OrganismSpawner" type="Node2D" parent="."]
+script = ExtResource("6_272bh")
+
+[node name="SpritePreview" type="Node2D" parent="OrganismSpawner"]
+
+[node name="Phantom" type="Sprite2D" parent="OrganismSpawner/SpritePreview"]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_0xm2m")
+
+[node name="Phantom" type="Sprite2D" parent="OrganismSpawner"]
+modulate = Color(0, 1, 0.1833334, 0.5254902)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_0xm2m")
+
+[node name="UserInterface" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UserInterface"]
+anchors_preset = -1
+anchor_left = 0.98
+anchor_top = 0.5
+anchor_right = 0.98
+anchor_bottom = 0.5
+offset_left = -161.0
+offset_top = -286.0
+offset_bottom = 286.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UserInterface/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 31
+text = "Organisms"
+horizontal_alignment = 1
+
+[node name="OrganismList" type="VBoxContainer" parent="UserInterface/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ScoreLabel" type="Label" parent="UserInterface"]
+anchors_preset = -1
+offset_left = 33.0
+offset_top = 26.0
+offset_right = 239.0
+offset_bottom = 83.0
+theme_override_font_sizes/font_size = 41
+text = "Score: 0"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="UserInterface"]
+anchors_preset = -1
+offset_left = 41.0
+offset_top = 122.0
+offset_right = 227.0
+offset_bottom = 352.0
+
+[node name="OrgTypesLabel" type="Label" parent="UserInterface/VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="UserInterface"]
+anchors_preset = -1
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -128.0
+offset_right = 392.0
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="UserInterface/VBoxContainer2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "DISASTERS"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UserInterface/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TextureButton" type="TextureButton" parent="UserInterface/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("2_0xm2m")
+stretch_mode = 0
+
+[node name="TextureButton2" type="TextureButton" parent="UserInterface/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("2_0xm2m")
+stretch_mode = 0
+
+[node name="TextureButton3" type="TextureButton" parent="UserInterface/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("2_0xm2m")
+stretch_mode = 0
+
+[node name="DaysLabel" type="Label" parent="UserInterface"]
+unique_name_in_owner = true
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 71.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 36
+text = "DAY 0"
+
+[connection signal="list_organism_spawned" from="." to="." method="_on_list_organism_spawned"]
+[connection signal="organism_death" from="." to="." method="_on_organism_death"]
+[connection signal="organism_position_updated" from="." to="." method="_on_organism_position_updated"]
+[connection signal="organism_reproduced" from="." to="." method="_on_organism_reproduced"]
+[connection signal="organism_spawned" from="." to="." method="_on_organism_spawned"]
