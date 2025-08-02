@@ -12,25 +12,28 @@ static var plant_heatmap : Array[int]
 static var group_size_info : Dictionary[GroupSizes, Dictionary] = {
 	GroupSizes.Atomic : {
 		"size" : 1,
-		"action_speed" : 1.5
+		"action_multiplier" : 1
 	},
 	GroupSizes.Small : {
 		"size" : 5,
-		"action_speed" : 1.0
+		"action_multiplier" : 5
 	},
 	GroupSizes.Big : {
 		"size" : 10,
-		"action_speed" : 0.5
+		"action_multiplier" : 10
 	},
 	GroupSizes.Large : {
 		"size" : 20,
-		"action_speed" : 0.26
+		"action_multiplier" : 20
 	}
 }
 
 @onready var sprite: Node2D = $Sprite
-@onready var action_timer: Timer = $ActionTimer
+#@onready var action_timer: Timer = $ActionTimer
 @onready var interaction_area: Area2D = $InteractionArea
+@onready var group_size_label: Label = $GroupSizeLabel
+@onready var count_label: Label = $CountLabel
+@onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D
 
 @export var type : Types :
 	get:
@@ -64,6 +67,8 @@ var size_value : float = 1
 var planet_position_value : float = 0
 var action_list : Array[Actions]
 var action_weights : Array[float]
+var action_time : float
+var action_timer : float
 
 var original_placement : float
 var is_initial_position : bool = true
@@ -85,8 +90,22 @@ var age_till_max_size : int
 var max_size : float
 var min_size : float = 0.5
 
-var count : int = 1
-var group_size : GroupSizes = GroupSizes.Atomic
+var count : int :
+	get:
+		return count_value
+	set(value):
+		count_value = value
+		
+		if is_instance_valid(count_label): count_label.text = str(count_value)
+var count_value = 1
+
+var group_size : GroupSizes :
+	get:
+		return group_size_value
+	set(value):
+		group_size_value = value
+		if is_instance_valid(group_size_label): group_size_label.text = GroupSizes.keys()[group_size_value]
+var group_size_value : GroupSizes = GroupSizes.Atomic 
 
 var root_ancestor : int = get_instance_id()
 
@@ -105,7 +124,14 @@ static func spawn(planet_position: float, type: Types = Types.values().pick_rand
 
 func _ready() -> void:
 	load_sprite()
+	
 	size = size
+	count = count
+	group_size = group_size
+	action_timer = randf_range(1.5, 2.0)
+	collision_shape_2d.shape.radius = 10
+	interaction_area.get_child(0).shape.radius = 22
+	
 	match type:
 		Types.Carnivore:
 			for action in Actions.values():
@@ -130,17 +156,17 @@ func _ready() -> void:
 	
 	$AncestorLabel.text = str(root_ancestor)
 	$NourishmentLabel.text = str(nourishment)
+	
+	set_process(false)
 
-func action_timer_start():
-	#match type:
-		#Types.Herbivore: action_timer.wait_time = randf_range(1.5,2.0)
-		#Types.Carnivore: action_timer.wait_time = randf_range(1.5,2.0)
-		#Types.Plant: action_timer.wait_time = randf_range(1.6,2.1)
-	action_timer.wait_time = group_size_info[group_size]["action_speed"] + randf() * 0.5
-	action_timer.start()
+func _process(delta: float) -> void:
+	action_timer -= delta
+	if action_timer <= 0:
+		action_timer = randf_range(1.5, 2.0)
+		_on_action_timer_timeout()
 
 func _on_action_timer_timeout() -> void:
-	action_timer_start()
+	if try_group(): return # order is necessary
 	
 	reproduction_timer = 0 if reproduction_timer < 0 else reproduction_timer - 1
 	match weighted_pick(action_list, action_weights):
@@ -150,23 +176,31 @@ func _on_action_timer_timeout() -> void:
 		Actions.Reproduce:
 			if reproduction_timer <= 0 and (nourishment > 0 or type == Types.Plant):
 				reproduction_timer = reproduction_time
-				reproduce()
-				nourishment -= 1
+				for i in count: reproduce()
+				nourishment -= 1 * count
 		Actions.Eat:
-			var prey : Organism
+			var prey : Array[Organism] = []
 			for o : Organism in interaction_area.get_overlapping_areas():
+				if prey.size() >= count: break
 				if o == self: continue
 				if type == Types.Carnivore and o.type == Types.Plant: continue
 				if type == Types.Herbivore and o.type != Types.Plant: continue
 				if o.root_ancestor != root_ancestor:
-					prey = o
-					break
+					prey.append(o)
 			
 			# eat prey
-			if is_instance_valid(prey): 
-				#print(Types.keys()[self.type], " eats ", Types.keys()[prey.type])
-				prey.death()
-				nourishment += 3
+			var eat_count = count
+			for i in range(prey.size() - 1, -1, -1):
+				if eat_count <= 0:
+					break
+
+				var p: Organism = prey[i]
+				if is_instance_valid(p):
+					p.death()
+					nourishment += 3
+					eat_count -= 1
+				else:
+					prey.remove_at(i)
 	
 	age += 1
 	if age < age_till_max_size and size < max_size:  size += 1.0/age_till_max_size*(max_size - min_size)
@@ -174,8 +208,6 @@ func _on_action_timer_timeout() -> void:
 	#print(Types.keys()[type], ": ",nourishment)
 	if age > lifespan:
 		death()
-	
-	try_group()
 
 #func can_plant_reproduce() -> bool:
 	#for o : Organism in interaction_area.get_overlapping_areas():
@@ -210,20 +242,20 @@ func spawn_to_planet(planet_position : float = 0) -> void:
 	on_spawned()
 
 func death() -> void:
-	if is_queued_for_deletion(): return
-	if type == Types.Plant:
-		var planet_circumference : float = TAU * Main.instance.planet_radius
-		var heatmap_index : int = int(floor(fmod(planet_position,planet_circumference)/planet_circumference*HEATMAP_SIZE))%HEATMAP_SIZE
-		plant_heatmap[heatmap_index] -= 1
+	try_unregister_plant()
 	
 	Main.instance.organism_death.emit(self)
-	queue_free()
+	
+	if count <= 1: 
+		queue_free()
+		return
+	count -= 1
 
 func on_spawned() -> void:
 	if type == Organism.Types.Plant: register_plant_spawn()
 	
 	Main.instance.organism_spawned.emit(self)
-	action_timer_start()
+	set_process(true)
 
 func reproduce() -> void:
 	var offspring : Organism = self.duplicate()
@@ -233,6 +265,7 @@ func reproduce() -> void:
 	offspring.max_size = self.max_size
 	
 	if type == Organism.Types.Plant: offspring.planet_position = pick_plant_offspring_position()
+	else: offspring.planet_position = planet_position + randf_range(-10,10) * (group_size + 1)
 	
 	offspring.on_spawned()
 	Main.instance.organism_reproduced.emit(offspring)
@@ -264,20 +297,35 @@ func find_least_dense_direction(start_index: int, max_steps : int = 10) -> int:
 
 	return current
 
+func try_unregister_plant(use_count : bool = false) -> void:
+	if type != Types.Plant: return
+	
+	var planet_circumference : float = TAU * Main.instance.planet_radius
+	var heatmap_index : int = int(floor(fmod(planet_position,planet_circumference)/planet_circumference*HEATMAP_SIZE))%HEATMAP_SIZE
+	plant_heatmap[heatmap_index] -= count if use_count else 1
+	
+	#print(str(plant_heatmap) + " grouping..." if use_count else "")
+
 func register_plant_spawn(spawn_position : float = planet_position) -> void:
 	if plant_heatmap == []:
 		for i in HEATMAP_SIZE: plant_heatmap.append(0)
 	
 	var planet_circumference : float = TAU * Main.instance.planet_radius
 	var heatmap_index : int = int(floor(fmod(spawn_position,planet_circumference)/planet_circumference*HEATMAP_SIZE))%HEATMAP_SIZE
-	plant_heatmap[heatmap_index] += 1
+	plant_heatmap[heatmap_index] += count
+	
+	#print(plant_heatmap, " spawning...")
 
-func try_group() -> void:
+func try_group() -> bool:
+	if group_size == GroupSizes.Large: return false
+	
 	var member_candidates : Array[Organism]= []
 	var org_count : int = count
 	var max_pos : float = planet_position
 	var min_pos : float = max_pos
+	var min_age : int = age
 	var max_age : int = age
+	var total_lifespan : int = lifespan
 	var total_nourishment : int = nourishment
 	var old_group_size : GroupSizes = group_size
 	var largest_size : float = size
@@ -285,17 +333,20 @@ func try_group() -> void:
 	
 	for o : Organism in interaction_area.get_overlapping_areas():
 		if o == self: continue
+		if o.is_queued_for_deletion(): continue
 		if (o.root_ancestor ==  root_ancestor or type == Types.Plant or type == Types.Herbivore) and o.type == type and group_size == o.group_size:
 			member_candidates.append(o)
 			org_count += o.count
 			total_nourishment += o.nourishment
+			total_lifespan += o.lifespan
 			if o.planet_position < min_pos: min_pos = o.planet_position
 			if o.planet_position > max_pos: max_pos = o.planet_position
-			if o.age > max_age: max_age = o.age
+			if o.age > min_age: min_age = o.age
+			if o.age < max_age: max_age = o.age
 			if o.size > largest_size: largest_size = o.size
 			if o.max_size > largest_max_size: largest_max_size = o.max_size
 	
-	if member_candidates.is_empty(): return
+	if member_candidates.is_empty(): return false
 	
 	for i in GroupSizes.values():
 		if org_count < group_size_info[i]["size"]:
@@ -304,26 +355,39 @@ func try_group() -> void:
 		if i == GroupSizes.values().size()-1 and org_count >= group_size_info[i]["size"]:
 			group_size = i
 	
-	if group_size == GroupSizes.Atomic: return
+	if group_size == GroupSizes.Atomic: return false
+	
+	try_unregister_plant(true)
+	for o : Organism in member_candidates: 
+		o.try_unregister_plant(true)
+		o.set_process(false)
+		o.queue_free()
 	
 	var circumference : float = TAU * Main.instance.planet_radius
 	planet_position = fmod(min_pos + fmod((max_pos - min_pos + circumference), circumference) / 2.0, circumference)
 	count = org_count
 	nourishment = total_nourishment
+	lifespan = total_lifespan + (max_age - min_age)
 	age = max_age
+	
+	var new_shape : CircleShape2D = CircleShape2D.new()
+	new_shape.radius = 22 * (group_size + 1) # 22 is default radius for interaction area
+	interaction_area.get_child(0).shape = new_shape
+	
+	new_shape = CircleShape2D.new()
+	new_shape.radius = 10 * (group_size + 1) # 10 is default radius
+	collision_shape_2d.shape = new_shape
 	
 	if group_size > old_group_size:
 		#TODO replace with sprite
-		max_size = largest_max_size + 1
-		size = largest_size + 1
-		
-		var new_shape : CircleShape2D = CircleShape2D.new()
-		new_shape.radius = interaction_area.get_child(0).shape.radius + 1
-		interaction_area.get_child(0).shape = new_shape
+		max_size = largest_max_size
+		size = largest_max_size * (group_size + 1)
 	
-	print(Types.keys()[type], " grouped with size ", group_size,": ", count)
+	register_plant_spawn(planet_position)
 	
-	for o : Organism in member_candidates: o.queue_free()
+	#print(Types.keys()[type], " grouped with size ", group_size,": ", count)
+	
+	return true
 
 func split() -> void:
 	pass

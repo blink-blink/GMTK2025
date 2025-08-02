@@ -14,10 +14,6 @@ script = ExtResource("1_5rwh6")
 
 [node name="Sprite" type="Node2D" parent="."]
 
-[node name="ActionTimer" type="Timer" parent="."]
-wait_time = 0.9750534034493092
-one_shot = true
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_5rwh6")
 
@@ -43,10 +39,34 @@ grow_vertical = 2
 horizontal_alignment = 1
 
 [node name="NourishmentLabel" type="Label" parent="."]
+anchors_preset = -1
+offset_left = -20.0
+offset_top = -45.0
+offset_right = 20.0
+offset_bottom = -22.0
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GroupSizeLabel" type="Label" parent="."]
+visible = false
+anchors_preset = -1
+offset_left = -28.0
+offset_top = -24.0
+offset_right = 27.0
+offset_bottom = -1.0
+theme_override_font_sizes/font_size = 10
+text = "Atomic"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="CountLabel" type="Label" parent="."]
 visible = false
 anchors_preset = -1
 offset_left = -20.0
+offset_top = -36.0
 offset_right = 20.0
-offset_bottom = 23.0
-
-[connection signal="timeout" from="ActionTimer" to="." method="_on_action_timer_timeout"]
+offset_bottom = -13.0
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1

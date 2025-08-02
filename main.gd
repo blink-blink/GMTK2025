@@ -1,7 +1,7 @@
 class_name Main extends Node2D
 
 const ORGANISM_SCENE : PackedScene = preload("res://organism.tscn")
-const INIT_ORGANISM_COUNT : int =  10
+const INIT_ORGANISM_COUNT : int =  15
 const INIT_ORGANISM_LIST_COUNT : int = 4
 
 @onready var organism_list: VBoxContainer = %OrganismList
@@ -39,7 +39,7 @@ func _ready() -> void:
 		
 		var planet_circumference = TAU * planet_radius
 		var target_position = planet_circumference * (i + randf_range(-0.5,0.5))/INIT_ORGANISM_COUNT
-		Organism.spawn(target_position, Organism.Types.Plant)
+		Organism.spawn(target_position)
 	
 	for i in INIT_ORGANISM_LIST_COUNT:
 		update_organism_list()
