@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://ersvdlw0tpx"
+path="res://.godot/imported/20 - Abstraction - Bioluminescence.ogg-2982fd9ae7cee17850db500259473587.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/music/20 - Abstraction - Bioluminescence.ogg"
+dest_files=["res://.godot/imported/20 - Abstraction - Bioluminescence.ogg-2982fd9ae7cee17850db500259473587.oggvorbisstr"]
+
+[params]
+
+loop=true
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

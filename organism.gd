@@ -51,6 +51,11 @@ static var group_size_info : Dictionary[GroupSizes, Dictionary] = {
 @onready var count_label: Label = $CountLabel
 @onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D
 
+#sounds
+@onready var eat_sfx: AudioStreamPlayer2D = %EatSFX
+@onready var spawn_sfx: AudioStreamPlayer2D = %SpawnSFX
+@onready var merge_sfx: AudioStreamPlayer2D = %MergeSFX
+
 @export var type : Types :
 	get:
 		return type_value
@@ -211,7 +216,8 @@ func _on_action_timer_timeout() -> void:
 					prey.append(o)
 			
 			# eat prey
-			var eat_count = count
+			var eat_count : int = count
+			var eat_successful : bool = false
 			for i in range(prey.size() - 1, -1, -1):
 				if eat_count <= 0:
 					break
@@ -221,8 +227,11 @@ func _on_action_timer_timeout() -> void:
 					p.death()
 					nourishment += 1
 					eat_count -= 1
+					eat_successful = true
 				else:
 					prey.remove_at(i)
+			
+			if eat_successful: eat_sfx.play()
 	
 	age += 1
 	if age < age_till_max_size and size < max_size:  size += 1.0/age_till_max_size*(max_size - min_size)
@@ -273,6 +282,7 @@ func on_spawned() -> void:
 	
 	Main.instance.organism_spawned.emit(self)
 	set_process(true)
+	spawn_sfx.play()
 
 func reproduce() -> void:
 	var offspring : Organism = self.duplicate()
@@ -285,7 +295,7 @@ func reproduce() -> void:
 	else: offspring.planet_position = planet_position + randf_range(-20,20) * (group_size + 1)
 	
 	offspring.on_spawned()
-	print("offspring: ", Types.keys()[offspring.type], " spawned")
+	#print("offspring: ", Types.keys()[offspring.type], " spawned")
 	Main.instance.organism_reproduced.emit(offspring)
 
 func pick_plant_offspring_position() -> float:
@@ -322,7 +332,7 @@ func try_unregister_plant(use_count : bool = false) -> void:
 	var heatmap_index : int = int(floor(fmod(planet_position,planet_circumference)/planet_circumference*HEATMAP_SIZE))%HEATMAP_SIZE
 	plant_heatmap[heatmap_index] -= count if use_count else 1
 	
-	print(str(plant_heatmap) + " grouping..." if use_count else "")
+	#print(str(plant_heatmap) + " grouping..." if use_count else "")
 
 func register_plant_spawn(spawn_position : float = planet_position) -> void:
 	if plant_heatmap == []:
@@ -332,7 +342,7 @@ func register_plant_spawn(spawn_position : float = planet_position) -> void:
 	var heatmap_index : int = int(floor(fmod(spawn_position,planet_circumference)/planet_circumference*HEATMAP_SIZE))%HEATMAP_SIZE
 	plant_heatmap[heatmap_index] += count
 	
-	print(plant_heatmap, " spawning...")
+	#print(plant_heatmap, " spawning...")
 
 func try_group() -> bool:
 	if group_size == GroupSizes.Large: return false
@@ -425,7 +435,9 @@ func try_group() -> bool:
 	
 	register_plant_spawn(planet_position)
 	
-	print(Types.keys()[type], " grouped with size ", group_size,": ", count)
+	merge_sfx.play()
+	
+	#print(Types.keys()[type], " grouped with size ", group_size,": ", count)
 	
 	return true
 

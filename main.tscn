@@ -1,13 +1,19 @@
-[gd_scene load_steps=28 format=3 uid="uid://b12mgldnbdwad"]
+[gd_scene load_steps=44 format=3 uid="uid://b12mgldnbdwad"]
 
 [ext_resource type="Script" uid="uid://hr0di1boicyx" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Texture2D" uid="uid://bhlywlfnvw7jf" path="res://icon.svg" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://dw85ydmx5fwft" path="res://camera.gd" id="2_1bvp3"]
 [ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="3_7mycd"]
-[ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="4_272bh"]
+[ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="4_ycdy4"]
 [ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="5_5vw27"]
 [ext_resource type="Script" uid="uid://ctw5bwg7kyj4b" path="res://organism_spawner.gd" id="6_272bh"]
 [ext_resource type="Texture2D" uid="uid://5kvpsfcb607j" path="res://assets/SpawnerPhantom.png" id="8_5vw27"]
+[ext_resource type="PackedScene" uid="uid://ceqrrl5wiui77" path="res://sprites/sprite_large_plant_2.tscn" id="9_ycdy4"]
+[ext_resource type="PackedScene" uid="uid://bqf76x6s040vy" path="res://sprites/sprite_big_plant.tscn" id="10_w48qg"]
+[ext_resource type="PackedScene" uid="uid://cle54v8vmroqf" path="res://sprites/sprite_atomic_plant.tscn" id="11_vivmo"]
+[ext_resource type="PackedScene" uid="uid://bsfepxvt36sr8" path="res://sprites/sprite_big_plant_2.tscn" id="12_2cqfq"]
+[ext_resource type="PackedScene" uid="uid://baudn41qkhi06" path="res://bunny_head_test.tscn" id="13_yaehf"]
+[ext_resource type="AudioStream" uid="uid://ersvdlw0tpx" path="res://assets/music/20 - Abstraction - Bioluminescence.ogg" id="14_w48qg"]
 
 [sub_resource type="Gradient" id="Gradient_h2yge"]
 offsets = PackedFloat32Array(0.17299578, 0.43037975, 0.51054853, 0.5864979, 0.8691983)
@@ -139,6 +145,128 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 corner_detail = 5
 
+[sub_resource type="Gradient" id="Gradient_074og"]
+offsets = PackedFloat32Array(0, 0.36097562, 1)
+colors = PackedColorArray(0.16517337, 0.1368, 0.38, 1, 0.5999999, 0, 1, 1, 1, 0.61, 0.6815001, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_cegan"]
+gradient = SubResource("Gradient_074og")
+fill_to = Vector2(1, 0.55128205)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_82xsv"]
+texture = SubResource("GradientTexture2D_cegan")
+
+[sub_resource type="Curve2D" id="Curve2D_getpj"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 276.15, 500, 0, 276.15, 0, -276.15, 0, 0, 500, 0, 276.15, 0, -276.15, -500, 0, -276.15, 0, 276.15, 0, 0, -500, 0, -276.15, 0, 0, 500, 0)
+}
+point_count = 5
+
+[sub_resource type="Resource" id="Resource_ryguw"]
+script = ExtResource("5_5vw27")
+
+[sub_resource type="Animation" id="Animation_1u8w0"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Ellipse:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_d13ii"]
+resource_name = "idle"
+length = 20.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Ellipse:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 20),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 6.2831855]
+}
+
+[sub_resource type="Animation" id="Animation_0odxb"]
+resource_name = "start"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -648)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lswn8"]
+_data = {
+&"RESET": SubResource("Animation_1u8w0"),
+&"idle": SubResource("Animation_d13ii"),
+&"start": SubResource("Animation_0odxb")
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a6jrf"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
 [node name="Main" type="Node2D" node_paths=PackedStringArray("planet")]
 script = ExtResource("1_ig7tw")
 planet = NodePath("Planet")
@@ -221,8 +349,6 @@ script = ExtResource("3_7mycd")
 polygon = NodePath("Fill")
 curve = SubResource("Curve2D_5vw27")
 arc_list = SubResource("Resource_kek77")
-size = Vector2(60, 60)
-metadata/_select_hint_ = true
 metadata/_hover_closest_point_on_curve_ = Object(Object,"script":Resource("res://addons/curved_lines_2d/closest_point_on_curve_meta.gd"),"before_segment":3,"point_position":Vector2(-2.320404, 2.859192),"local_point_position":Vector2(-9.281616, 11.436768))
 
 
@@ -238,6 +364,14 @@ libraries = {
 &"": SubResource("AnimationLibrary_w48qg")
 }
 autoplay = "idle"
+
+[node name="FatigueTimer" type="Timer" parent="."]
+wait_time = 300.0
+one_shot = true
+
+[node name="ListAddTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+wait_time = 10.0
 
 [node name="UserInterface" type="CanvasLayer" parent="."]
 
@@ -352,12 +486,223 @@ theme_override_constants/outline_size = 20
 theme_override_font_sizes/font_size = 36
 text = "DAY 0"
 
-[node name="FatigueTimer" type="Timer" parent="."]
-wait_time = 300.0
-one_shot = true
+[node name="GameOverScreen" type="PanelContainer" parent="UserInterface"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UserInterface/GameOverScreen"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="UserInterface/GameOverScreen/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "GAME OVER"
+
+[node name="RestartButton" type="Button" parent="UserInterface/GameOverScreen/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Restart?"
+
+[node name="StartScreen" type="Panel" parent="UserInterface"]
+unique_name_in_owner = true
+clip_contents = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_82xsv")
+
+[node name="Ellipse" type="Node2D" parent="UserInterface/StartScreen" node_paths=PackedStringArray("polygon")]
+position = Vector2(-4, 635)
+script = ExtResource("3_7mycd")
+polygon = NodePath("Fill")
+curve = SubResource("Curve2D_getpj")
+arc_list = SubResource("Resource_ryguw")
+shape_type = 2
+size = Vector2(1000, 1000)
+rx = 500.0
+ry = 500.0
+
+[node name="Fill" type="Polygon2D" parent="UserInterface/StartScreen/Ellipse"]
+color = Color(0, 0, 0, 1)
+polygon = PackedVector2Array(500, 0, 497.41864, 51.123352, 489.8421, 100.76962, 477.52164, 148.68753, 460.7086, 194.62578, 439.65424, 238.33307, 414.60986, 279.5581, 385.82678, 318.0496, 353.55624, 353.55624, 318.0496, 385.82678, 279.5581, 414.60986, 238.33307, 439.65424, 194.62578, 460.7086, 148.68753, 477.52164, 100.76962, 489.8421, 51.123352, 497.41864, 0, 500, -51.123352, 497.41864, -100.76962, 489.8421, -148.68753, 477.52164, -194.62578, 460.7086, -238.33307, 439.65424, -279.5581, 414.60986, -318.0496, 385.82678, -353.55624, 353.55624, -385.82678, 318.0496, -414.60986, 279.5581, -439.65424, 238.33307, -460.7086, 194.62578, -477.52164, 148.68753, -489.8421, 100.76962, -497.41864, 51.123352, -500, 0, -497.41864, -51.123352, -489.8421, -100.76962, -477.52164, -148.68753, -460.7086, -194.62578, -439.65424, -238.33307, -414.60986, -279.5581, -385.82678, -318.0496, -353.55624, -353.55624, -318.0496, -385.82678, -279.5581, -414.60986, -238.33307, -439.65424, -194.62578, -460.7086, -148.68753, -477.52164, -100.76962, -489.8421, -51.123352, -497.41864, 0, -500, 51.123352, -497.41864, 100.76962, -489.8421, 148.68753, -477.52164, 194.62578, -460.7086, 238.33307, -439.65424, 279.5581, -414.60986, 318.0496, -385.82678, 353.55624, -353.55624, 385.82678, -318.0496, 414.60986, -279.5581, 439.65424, -238.33307, 460.7086, -194.62578, 477.52164, -148.68753, 489.8421, -100.76962, 497.41864, -51.123352)
+metadata/_edit_lock_ = true
+
+[node name="SpriteLargePlant2" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("9_ycdy4")]
+position = Vector2(0, -495)
+scale = Vector2(0.18812372, 0.18812372)
+
+[node name="SpriteBigPlant" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("10_w48qg")]
+position = Vector2(446.00006, -178)
+rotation = 1.0725328
+scale = Vector2(0.17725864, 0.17725864)
+
+[node name="SpriteAtomicPlant" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("11_vivmo")]
+position = Vector2(83, -488)
+rotation = 0.13133083
+scale = Vector2(0.3312664, 0.3312664)
+
+[node name="SpriteBigPlant2" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("12_2cqfq")]
+position = Vector2(-393, -269)
+rotation = -1.043689
+scale = Vector2(0.37391466, 0.38905308)
+
+[node name="SpriteBigPlant3" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("12_2cqfq")]
+position = Vector2(-436, -183)
+rotation = -1.1075838
+scale = Vector2(0.25012898, 0.26025578)
+
+[node name="SpriteAtomicPlant2" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("11_vivmo")]
+position = Vector2(-317, -373)
+rotation = -0.719607
+scale = Vector2(0.50282145, 0.50282145)
+
+[node name="SpriteLargePlant3" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("9_ycdy4")]
+position = Vector2(-269, 413)
+rotation = -2.5813534
+scale = Vector2(0.23834507, 0.23834507)
+
+[node name="BunnySprite" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("13_yaehf")]
+position = Vector2(159, -465)
+rotation = 0.3068673
+scale = Vector2(0.74733925, 0.74733925)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite/Head/Ellipse" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite/Head/Ellipse2" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="BunnySprite4" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("13_yaehf")]
+position = Vector2(475, -125.99997)
+rotation = 1.2569426
+scale = Vector2(0.32288384, 0.32288384)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite4/Head/Ellipse" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite4/Head/Ellipse2" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="BunnySprite5" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("13_yaehf")]
+position = Vector2(-92, 486.99997)
+rotation = 3.403392
+scale = Vector2(1.3910223, 1.3910223)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite5/Head/Ellipse" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite5/Head/Ellipse2" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="BunnySprite3" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("13_yaehf")]
+position = Vector2(90.99999, -486)
+rotation = 0.18216975
+scale = Vector2(0.6070716, 0.6070716)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite3/Head/Ellipse" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite3/Head/Ellipse2" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="BunnySprite2" parent="UserInterface/StartScreen/Ellipse" instance=ExtResource("13_yaehf")]
+position = Vector2(210.00002, -445.00003)
+rotation = 0.44637567
+scale = Vector2(0.38787875, 0.38787875)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite2/Head/Ellipse" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Fill" parent="UserInterface/StartScreen/Ellipse/BunnySprite2/Head/Ellipse2" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="BunnySprite" parent="UserInterface/StartScreen" instance=ExtResource("13_yaehf")]
+position = Vector2(675.00006, 276)
+rotation = -0.1698089
+
+[node name="Fill" parent="UserInterface/StartScreen/BunnySprite/Head/Ellipse" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Fill" parent="UserInterface/StartScreen/BunnySprite/Head/Ellipse2" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="BunnySprite2" parent="UserInterface/StartScreen" instance=ExtResource("13_yaehf")]
+position = Vector2(978, 270.00003)
+rotation = 0.37087372
+scale = Vector2(1.1991128, 1.1392436)
+
+[node name="Fill" parent="UserInterface/StartScreen/BunnySprite2/Head/Ellipse" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Fill" parent="UserInterface/StartScreen/BunnySprite2/Head/Ellipse2" index="0"]
+color = Color(1, 1, 1, 1)
+
+[node name="Label" type="Label" parent="UserInterface/StartScreen"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 571.0
+offset_top = 161.0
+offset_right = 1034.0
+offset_bottom = 280.0
+size_flags_horizontal = 4
+theme_override_constants/outline_size = 30
+theme_override_font_sizes/font_size = 100
+text = "LoopLife"
+
+[node name="StartButton" type="Button" parent="UserInterface/StartScreen"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 718.0
+offset_top = 311.0
+offset_right = 871.0
+offset_bottom = 379.0
+theme_override_font_sizes/font_size = 50
+text = "Start"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UserInterface/StartScreen"]
+unique_name_in_owner = true
+libraries = {
+&"": SubResource("AnimationLibrary_lswn8")
+}
+autoplay = "idle"
+
+[node name="PanelContainer2" type="PanelContainer" parent="UserInterface"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_a6jrf")
+
+[node name="BGM" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("14_w48qg")
+volume_db = -20.0
+autoplay = true
 
 [connection signal="list_organism_spawned" from="." to="." method="_on_list_organism_spawned"]
 [connection signal="organism_death" from="." to="." method="_on_organism_death"]
 [connection signal="organism_position_updated" from="." to="." method="_on_organism_position_updated"]
 [connection signal="organism_reproduced" from="." to="." method="_on_organism_reproduced"]
 [connection signal="organism_spawned" from="." to="." method="_on_organism_spawned"]
+[connection signal="timeout" from="ListAddTimer" to="." method="_on_list_add_timer_timeout"]
+[connection signal="pressed" from="UserInterface/GameOverScreen/VBoxContainer/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="UserInterface/StartScreen/StartButton" to="." method="_on_start_button_pressed"]
+
+[editable path="UserInterface/StartScreen/Ellipse/BunnySprite"]
+[editable path="UserInterface/StartScreen/Ellipse/BunnySprite4"]
+[editable path="UserInterface/StartScreen/Ellipse/BunnySprite5"]
+[editable path="UserInterface/StartScreen/Ellipse/BunnySprite3"]
+[editable path="UserInterface/StartScreen/Ellipse/BunnySprite2"]
+[editable path="UserInterface/StartScreen/BunnySprite"]
+[editable path="UserInterface/StartScreen/BunnySprite2"]

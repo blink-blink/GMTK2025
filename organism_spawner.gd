@@ -6,18 +6,21 @@ extends Node2D
 var planet_spawn_position : float
 var organism_to_spawn : Organism
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event is InputEventMouse and visible:
 		get_viewport().set_input_as_handled()
+	else:
+		return
 	
 	#if Input.is_action_just_pressed("drag"): show()
-	if Input.is_action_just_released("drag"): 
-		if is_instance_valid(organism_to_spawn): 
-			organism_to_spawn.get_parent().remove_child(organism_to_spawn)
-			organism_to_spawn.show()
-			organism_to_spawn.spawn_to_planet(planet_spawn_position)
-			organism_to_spawn = null
-		hide()
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and not event.is_pressed(): 
+			if is_instance_valid(organism_to_spawn): 
+				organism_to_spawn.get_parent().remove_child(organism_to_spawn)
+				organism_to_spawn.show()
+				organism_to_spawn.spawn_to_planet(planet_spawn_position)
+				organism_to_spawn = null
+			hide()
 
 func _ready() -> void:
 	hide()

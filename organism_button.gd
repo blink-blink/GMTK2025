@@ -27,3 +27,8 @@ func on_organism_spawned(organism : Organism) -> void:
 func _on_pressed() -> void:
 	#print("pressed")
 	Main.instance.organism_spawner.spawn(organism)
+
+func _get_drag_data(at_position: Vector2) -> Variant:
+	#print("dragged")
+	Main.instance.organism_spawner.spawn(organism)
+	return null

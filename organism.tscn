@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://c2p821bgegxi6"]
+[gd_scene load_steps=6 format=3 uid="uid://c2p821bgegxi6"]
 
 [ext_resource type="Script" uid="uid://cxy84ala2gkh5" path="res://organism.gd" id="1_5rwh6"]
+[ext_resource type="AudioStream" uid="uid://dcba5p0qiu7le" path="res://assets/sounds/cartoon-bite1-freesound-community.wav" id="2_mgi51"]
+[ext_resource type="AudioStream" uid="uid://cu0xhtmaxyjqb" path="res://assets/sounds/bubble-sound-freesound-community.wav" id="3_xrehl"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5rwh6"]
 radius = 10.198039
@@ -71,3 +73,20 @@ offset_bottom = -13.0
 text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="EatSFX" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("2_mgi51")
+volume_db = -10.0
+max_distance = 500.0
+
+[node name="SpawnSFX" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("3_xrehl")
+volume_db = -10.0
+max_distance = 500.0
+
+[node name="MergeSFX" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
+volume_db = 5.0
+max_distance = 500.0

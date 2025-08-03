@@ -15,6 +15,10 @@ const MAX_PLANT_COUNT = 100
 @onready var organism_spawner: Node2D = $OrganismSpawner
 @onready var fatigue_timer: Timer = $FatigueTimer
 @onready var fatigue_label: PanelContainer = %FatigueLabel
+@onready var game_over_screen: PanelContainer = %GameOverScreen
+@onready var start_screen: Panel = %StartScreen
+@onready var start_screen_animation_player: AnimationPlayer = %AnimationPlayer
+@onready var list_add_timer: Timer = %ListAddTimer
 
 static var instance : Node2D
 
@@ -38,6 +42,13 @@ var org_type_counter : Array[int]
 func _ready() -> void:
 	instance = self
 	
+	game_over_screen.hide()
+	
+	update_score_label()
+	
+	fatigue_label.modulate = Color.TRANSPARENT
+
+func init_game() -> void:
 	for i in INIT_ORGANISM_COUNT:
 		
 		var planet_circumference = TAU * planet_radius
@@ -45,11 +56,7 @@ func _ready() -> void:
 		Organism.spawn(target_position)
 	
 	for i in INIT_ORGANISM_LIST_COUNT:
-		update_organism_list()
-	
-	update_score_label()
-	
-	fatigue_label.modulate = Color.TRANSPARENT
+		update_organism_list() 
 
 func _physics_process(delta: float) -> void:
 	celestials.rotation += delta * TAU/seconds_per_day
@@ -96,8 +103,22 @@ func update_org_type_label(o : Organism, is_death : bool = false) -> void:
 	org_type_counter[o.type] += 1 if not is_death else -1
 	var text : String = ""
 	for i in Organism.Types.size():
-		text += Organism.Types.keys()[i] + " : " + str(org_type_counter[i]) + "\n"
+		text += Organism.Types.keys()[i] + " : " + str(maxi(0,org_type_counter[i])) + "\n"
 	org_types_label.text = text
+	
+	
+	#game over
+	
+	if not is_death: return
+	
+	var total_org : int
+	for i in org_type_counter:
+		total_org += i
+	if total_org <= 0:
+		game_over_screen.show()
+		game_over_screen.modulate = Color.TRANSPARENT
+		var tween : Tween = create_tween()
+		tween.tween_property(game_over_screen,"modulate:a",1,0.5)
 
 func _on_organism_spawned(organism: Organism) -> void:
 	update_org_type_label(organism)
@@ -108,7 +129,7 @@ func _on_organism_spawned(organism: Organism) -> void:
 
 func _on_list_organism_spawned() -> void:
 	#print("list spawned")
-	update_organism_list()
+	if list_add_timer.is_stopped(): list_add_timer.start()
 
 var fatigue_tween : Tween
 func can_plants_spawn() -> bool:
@@ -127,3 +148,16 @@ func can_plants_spawn() -> bool:
 	fatigue_tween = create_tween()
 	fatigue_tween.tween_property(fatigue_label, "modulate:a", 0,0.3)
 	return true
+
+
+func _on_restart_button_pressed() -> void:
+	get_tree().reload_current_scene()
+
+
+func _on_start_button_pressed() -> void:
+	init_game()
+	start_screen_animation_player.play("start")
+
+func _on_list_add_timer_timeout() -> void:
+	update_organism_list()
+	if organism_list.get_child_count() >= 4: list_add_timer.stop()
