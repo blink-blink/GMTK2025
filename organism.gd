@@ -12,19 +12,35 @@ static var plant_heatmap : Array[int]
 static var group_size_info : Dictionary[GroupSizes, Dictionary] = {
 	GroupSizes.Atomic : {
 		"size" : 1,
-		"action_multiplier" : 1
+		"sprite_map" : {
+			Types.Herbivore : [preload("res://bunny_head_test.tscn")],
+			Types.Carnivore : [preload("res://bunny_head_test.tscn")],
+			Types.Plant : [preload("res://sprites/sprite_atomic_plant.tscn")],
+		}
 	},
 	GroupSizes.Small : {
 		"size" : 5,
-		"action_multiplier" : 5
+		"sprite_map" : {
+			Types.Herbivore : [preload("res://bunny_head_test.tscn")],
+			Types.Carnivore : [preload("res://bunny_head_test.tscn")],
+			Types.Plant : [preload("res://sprites/srpite_small_plant.tscn")],
+		}
 	},
 	GroupSizes.Big : {
 		"size" : 10,
-		"action_multiplier" : 10
+		"sprite_map" : {
+			Types.Herbivore : [preload("res://bunny_head_test.tscn")],
+			Types.Carnivore : [preload("res://bunny_head_test.tscn")],
+			Types.Plant : [preload("res://sprites/sprite_big_plant.tscn"), preload("res://sprites/sprite_big_plant_2.tscn")],
+		}
 	},
 	GroupSizes.Large : {
 		"size" : 20,
-		"action_multiplier" : 20
+		"sprite_map" : {
+			Types.Herbivore : [preload("res://bunny_head_test.tscn")],
+			Types.Carnivore : [preload("res://bunny_head_test.tscn")],
+			Types.Plant : [preload("res://sprites/sprite_large_plant.tscn"), preload("res://sprites/sprite_large_plant_2.tscn")],
+		}
 	}
 }
 
@@ -109,6 +125,9 @@ var group_size_value : GroupSizes = GroupSizes.Atomic
 
 var root_ancestor : int = get_instance_id()
 
+var is_despawning : bool = false
+var tween : Tween
+
 const ORGANISM_SCENE : PackedScene = preload("res://organism.tscn")
 
 static func spawn(planet_position: float, type: Types = Types.values().pick_random(), size : int = randi_range(1,3)) -> Organism:
@@ -171,13 +190,16 @@ func _on_action_timer_timeout() -> void:
 	reproduction_timer = 0 if reproduction_timer < 0 else reproduction_timer - 1
 	match weighted_pick(action_list, action_weights):
 		Actions.Move:
-			var tween : Tween = create_tween()
+			if tween: tween.kill()
+			tween = create_tween()
 			tween.tween_property(self, "planet_position", planet_position + randf_range(-10,10),0.25)
 		Actions.Reproduce:
-			if reproduction_timer <= 0 and (nourishment > 0 or type == Types.Plant):
+			if reproduction_timer <= 0 and (nourishment >= count or type == Types.Plant):
 				reproduction_timer = reproduction_time
-				for i in count: reproduce()
-				nourishment -= 1 * count
+				for i in count: 
+					if type == Types.Plant and not Main.instance.can_plants_spawn(): break
+					reproduce()
+				nourishment -= count
 		Actions.Eat:
 			var prey : Array[Organism] = []
 			for o : Organism in interaction_area.get_overlapping_areas():
@@ -195,9 +217,9 @@ func _on_action_timer_timeout() -> void:
 					break
 
 				var p: Organism = prey[i]
-				if is_instance_valid(p):
+				if is_instance_valid(p) and not p.is_despawning:
 					p.death()
-					nourishment += 3
+					nourishment += 1
 					eat_count -= 1
 				else:
 					prey.remove_at(i)
@@ -218,14 +240,9 @@ func _on_action_timer_timeout() -> void:
 
 func load_sprite() -> void:
 	update_color()
-	var sprite_list : Dictionary[Types, Array] = {
-		Types.Plant : [preload("res://big_plant_sprite.tscn")],
-		Types.Herbivore : [preload("res://bunny_head_test.tscn")],
-		Types.Carnivore : [preload("res://bunny_head_test.tscn")]
-	}
 	
-	var sprite_scene : Node2D = sprite_list[type].pick_random().instantiate()
-	sprite.add_child(sprite_scene)
+	for s : Node2D in sprite.get_children(): s.queue_free()
+	sprite.add_child(group_size_info[group_size]["sprite_map"][type].pick_random().instantiate())
 
 func update_color() -> void:
 	if not is_instance_valid(sprite): return
@@ -265,9 +282,10 @@ func reproduce() -> void:
 	offspring.max_size = self.max_size
 	
 	if type == Organism.Types.Plant: offspring.planet_position = pick_plant_offspring_position()
-	else: offspring.planet_position = planet_position + randf_range(-10,10) * (group_size + 1)
+	else: offspring.planet_position = planet_position + randf_range(-20,20) * (group_size + 1)
 	
 	offspring.on_spawned()
+	print("offspring: ", Types.keys()[offspring.type], " spawned")
 	Main.instance.organism_reproduced.emit(offspring)
 
 func pick_plant_offspring_position() -> float:
@@ -304,7 +322,7 @@ func try_unregister_plant(use_count : bool = false) -> void:
 	var heatmap_index : int = int(floor(fmod(planet_position,planet_circumference)/planet_circumference*HEATMAP_SIZE))%HEATMAP_SIZE
 	plant_heatmap[heatmap_index] -= count if use_count else 1
 	
-	#print(str(plant_heatmap) + " grouping..." if use_count else "")
+	print(str(plant_heatmap) + " grouping..." if use_count else "")
 
 func register_plant_spawn(spawn_position : float = planet_position) -> void:
 	if plant_heatmap == []:
@@ -314,7 +332,7 @@ func register_plant_spawn(spawn_position : float = planet_position) -> void:
 	var heatmap_index : int = int(floor(fmod(spawn_position,planet_circumference)/planet_circumference*HEATMAP_SIZE))%HEATMAP_SIZE
 	plant_heatmap[heatmap_index] += count
 	
-	#print(plant_heatmap, " spawning...")
+	print(plant_heatmap, " spawning...")
 
 func try_group() -> bool:
 	if group_size == GroupSizes.Large: return false
@@ -334,6 +352,7 @@ func try_group() -> bool:
 	for o : Organism in interaction_area.get_overlapping_areas():
 		if o == self: continue
 		if o.is_queued_for_deletion(): continue
+		if o.is_despawning: continue
 		if (o.root_ancestor ==  root_ancestor or type == Types.Plant or type == Types.Herbivore) and o.type == type and group_size == o.group_size:
 			member_candidates.append(o)
 			org_count += o.count
@@ -357,17 +376,30 @@ func try_group() -> bool:
 	
 	if group_size == GroupSizes.Atomic: return false
 	
+	var circumference : float = TAU * Main.instance.planet_radius
+	var merged_position : float = fmod(min_pos + fmod((max_pos - min_pos + circumference), circumference) / 2.0, circumference)
+	var angle : float = merged_position/circumference * TAU
+	var actual_merged_position = Main.instance.planet.global_position - Vector2(cos(angle), sin(angle)) * Main.instance.planet_radius
+	
 	try_unregister_plant(true)
 	for o : Organism in member_candidates: 
 		o.try_unregister_plant(true)
 		o.set_process(false)
-		o.queue_free()
+		o.is_despawning = true
+		#o.queue_free()
+		
+		if o.tween: o.tween.kill()
+		o.tween = create_tween()
+		o.tween.tween_property(o, "global_position", actual_merged_position, 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		o.tween.tween_callback(o.queue_free)
 	
-	var circumference : float = TAU * Main.instance.planet_radius
-	planet_position = fmod(min_pos + fmod((max_pos - min_pos + circumference), circumference) / 2.0, circumference)
+	if tween: tween.kill()
+	tween = create_tween()
+	tween.tween_property(self, "global_position", actual_merged_position, 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	planet_position = merged_position
 	count = org_count
 	nourishment = total_nourishment
-	lifespan = total_lifespan + (max_age - min_age)
+	lifespan += (max_age - min_age)
 	age = max_age
 	
 	var new_shape : CircleShape2D = CircleShape2D.new()
@@ -380,12 +412,20 @@ func try_group() -> bool:
 	
 	if group_size > old_group_size:
 		#TODO replace with sprite
-		max_size = largest_max_size
-		size = largest_max_size * (group_size + 1)
+		if type == Types.Plant:
+			max_size = largest_max_size
+			var old_size : float = size
+			tween.tween_property(self, "size", largest_max_size * (1 + 0.25 * (group_size + 1)), 0.1).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+			tween.tween_callback(load_sprite)
+			tween.tween_property(self, "size", old_size, 0.1).set_trans(Tween.TRANS_SPRING).set_ease(Tween.EASE_OUT)
+		else:
+			load_sprite()
+			tween.tween_property(self, "size", largest_max_size * (group_size + 1), 0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		#size = largest_max_size * (group_size + 1)
 	
 	register_plant_spawn(planet_position)
 	
-	#print(Types.keys()[type], " grouped with size ", group_size,": ", count)
+	print(Types.keys()[type], " grouped with size ", group_size,": ", count)
 	
 	return true
 

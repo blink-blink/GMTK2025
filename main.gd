@@ -3,6 +3,7 @@ class_name Main extends Node2D
 const ORGANISM_SCENE : PackedScene = preload("res://organism.tscn")
 const INIT_ORGANISM_COUNT : int =  15
 const INIT_ORGANISM_LIST_COUNT : int = 4
+const MAX_PLANT_COUNT = 100
 
 @onready var organism_list: VBoxContainer = %OrganismList
 @onready var celestials: Sprite2D = $Celestials
@@ -12,6 +13,8 @@ const INIT_ORGANISM_LIST_COUNT : int = 4
 @onready var score_label: Label = $UserInterface/ScoreLabel
 @onready var org_types_label: Label = %OrgTypesLabel
 @onready var organism_spawner: Node2D = $OrganismSpawner
+@onready var fatigue_timer: Timer = $FatigueTimer
+@onready var fatigue_label: PanelContainer = %FatigueLabel
 
 static var instance : Node2D
 
@@ -45,6 +48,8 @@ func _ready() -> void:
 		update_organism_list()
 	
 	update_score_label()
+	
+	fatigue_label.modulate = Color.TRANSPARENT
 
 func _physics_process(delta: float) -> void:
 	celestials.rotation += delta * TAU/seconds_per_day
@@ -104,3 +109,21 @@ func _on_organism_spawned(organism: Organism) -> void:
 func _on_list_organism_spawned() -> void:
 	#print("list spawned")
 	update_organism_list()
+
+var fatigue_tween : Tween
+func can_plants_spawn() -> bool:
+	if not fatigue_timer.is_stopped(): return false
+	
+	if org_type_counter[Organism.Types.Plant] > MAX_PLANT_COUNT: 
+		if fatigue_tween: fatigue_tween.kill()
+		fatigue_tween = create_tween()
+		fatigue_label.modulate = Color.TRANSPARENT
+		fatigue_tween.tween_property(fatigue_label, "modulate:a", 1,0.3)
+		
+		fatigue_timer.start()
+		return false
+	
+	if fatigue_tween: fatigue_tween.kill()
+	fatigue_tween = create_tween()
+	fatigue_tween.tween_property(fatigue_label, "modulate:a", 0,0.3)
+	return true

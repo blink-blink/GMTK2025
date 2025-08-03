@@ -1,27 +1,27 @@
-[gd_scene load_steps=6 format=3 uid="uid://4o4f2kwayn86"]
+[gd_scene load_steps=6 format=3 uid="uid://c7jyn47to5ohx"]
 
-[ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="1_nym1r"]
-[ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="2_nym1r"]
-[ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="3_4muf0"]
+[ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="1_jhyeh"]
+[ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="2_jhyeh"]
+[ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="3_368wi"]
 
-[sub_resource type="Curve2D" id="Curve2D_esydj"]
+[sub_resource type="Curve2D" id="Curve2D_uv5qg"]
 _data = {
 "points": PackedVector2Array(0, 0, 27.0627, 0, 1, -100, 0, -32.5857, 0, 0, 50, -41, 0, 0, 0, 32.5857, 50, 41, 0, 32.5857, 0, 0, -50, 41, 0, 0, 0, -32.5857, -50, -41, -27.0627, 0, 0, 0, -1, -100, 0, 0, 27.0627, 0, 1, -100)
 }
 point_count = 7
 
-[sub_resource type="Resource" id="Resource_kvxhn"]
-script = ExtResource("3_4muf0")
+[sub_resource type="Resource" id="Resource_7w0ut"]
+script = ExtResource("3_368wi")
 
-[node name="BigPlantSprite" type="Node2D"]
+[node name="SpriteLargePlant" type="Node2D"]
 
 [node name="Rectangle" type="Node2D" parent="." node_paths=PackedStringArray("polygon")]
-position = Vector2(0, -94)
-scale = Vector2(2.165, 2.165)
-script = ExtResource("1_nym1r")
+position = Vector2(0, -304)
+scale = Vector2(4.2329087, 5.6802506)
+script = ExtResource("1_jhyeh")
 polygon = NodePath("Fill")
-curve = SubResource("Curve2D_esydj")
-arc_list = SubResource("Resource_kvxhn")
+curve = SubResource("Curve2D_uv5qg")
+arc_list = SubResource("Resource_7w0ut")
 rx = 49.0
 ry = 59.0
 metadata/_select_hint_ = true

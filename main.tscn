@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://b12mgldnbdwad"]
+[gd_scene load_steps=28 format=3 uid="uid://b12mgldnbdwad"]
 
 [ext_resource type="Script" uid="uid://hr0di1boicyx" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Texture2D" uid="uid://bhlywlfnvw7jf" path="res://icon.svg" id="2_0xm2m"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="4_272bh"]
 [ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="5_5vw27"]
 [ext_resource type="Script" uid="uid://ctw5bwg7kyj4b" path="res://organism_spawner.gd" id="6_272bh"]
+[ext_resource type="Texture2D" uid="uid://5kvpsfcb607j" path="res://assets/SpawnerPhantom.png" id="8_5vw27"]
 
 [sub_resource type="Gradient" id="Gradient_h2yge"]
 offsets = PackedFloat32Array(0.17299578, 0.43037975, 0.51054853, 0.5864979, 0.8691983)
@@ -56,6 +57,87 @@ height = 392
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.9775216, 0.64868754)
+
+[sub_resource type="Curve2D" id="Curve2D_5vw27"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -30, -30, 0, 0, 0, 0, 30, -30, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, -30, -30)
+}
+point_count = 4
+
+[sub_resource type="Resource" id="Resource_kek77"]
+script = ExtResource("5_5vw27")
+
+[sub_resource type="Gradient" id="Gradient_4c57u"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.44313726)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_efxa6"]
+gradient = SubResource("Gradient_4c57u")
+width = 60
+height = 60
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Animation" id="Animation_ycdy4"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rectangle:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -128)]
+}
+
+[sub_resource type="Animation" id="Animation_dg77c"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rectangle:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.53333336, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -128), Vector2(0, -100), Vector2(0, -128)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_w48qg"]
+_data = {
+&"RESET": SubResource("Animation_ycdy4"),
+&"idle": SubResource("Animation_dg77c")
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kek77"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 0, 0, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5vw27"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 5
 
 [node name="Main" type="Node2D" node_paths=PackedStringArray("planet")]
 script = ExtResource("1_ig7tw")
@@ -129,9 +211,33 @@ scale = Vector2(0.25, 0.25)
 texture = ExtResource("2_0xm2m")
 
 [node name="Phantom" type="Sprite2D" parent="OrganismSpawner"]
-modulate = Color(0, 1, 0.1833334, 0.5254902)
 scale = Vector2(0.25, 0.25)
-texture = ExtResource("2_0xm2m")
+texture = ExtResource("8_5vw27")
+offset = Vector2(0, -64)
+
+[node name="Rectangle" type="Node2D" parent="OrganismSpawner/Phantom" node_paths=PackedStringArray("polygon")]
+position = Vector2(0, -128)
+script = ExtResource("3_7mycd")
+polygon = NodePath("Fill")
+curve = SubResource("Curve2D_5vw27")
+arc_list = SubResource("Resource_kek77")
+size = Vector2(60, 60)
+metadata/_select_hint_ = true
+metadata/_hover_closest_point_on_curve_ = Object(Object,"script":Resource("res://addons/curved_lines_2d/closest_point_on_curve_meta.gd"),"before_segment":3,"point_position":Vector2(-2.320404, 2.859192),"local_point_position":Vector2(-9.281616, 11.436768))
+
+
+[node name="Fill" type="Polygon2D" parent="OrganismSpawner/Phantom/Rectangle"]
+color = Color(1, 1, 1, 0.54509807)
+texture = SubResource("GradientTexture2D_efxa6")
+texture_offset = Vector2(30, 30)
+polygon = PackedVector2Array(-30, -30, 30, -30, 0, 30)
+metadata/_edit_lock_ = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="OrganismSpawner/Phantom"]
+libraries = {
+&"": SubResource("AnimationLibrary_w48qg")
+}
+autoplay = "idle"
 
 [node name="UserInterface" type="CanvasLayer" parent="."]
 
@@ -149,6 +255,7 @@ grow_vertical = 2
 
 [node name="Label" type="Label" parent="UserInterface/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/outline_size = 20
 theme_override_font_sizes/font_size = 31
 text = "Organisms"
 horizontal_alignment = 1
@@ -156,6 +263,7 @@ horizontal_alignment = 1
 [node name="OrganismList" type="VBoxContainer" parent="UserInterface/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_constants/separation = 0
 
 [node name="ScoreLabel" type="Label" parent="UserInterface"]
 anchors_preset = -1
@@ -163,21 +271,41 @@ offset_left = 33.0
 offset_top = 26.0
 offset_right = 239.0
 offset_bottom = 83.0
+theme_override_constants/outline_size = 20
 theme_override_font_sizes/font_size = 41
 text = "Score: 0"
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="UserInterface"]
+[node name="FatigueLabel" type="PanelContainer" parent="UserInterface"]
+unique_name_in_owner = true
+anchors_preset = -1
+offset_left = 33.0
+offset_top = 79.0
+offset_right = 212.0
+offset_bottom = 119.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_kek77")
+
+[node name="Label" type="Label" parent="UserInterface/FatigueLabel"]
+layout_mode = 2
+text = "PLANET FATIGUED!"
+
+[node name="PanelContainer" type="PanelContainer" parent="UserInterface"]
 anchors_preset = -1
 offset_left = 41.0
 offset_top = 122.0
-offset_right = 227.0
-offset_bottom = 352.0
+offset_right = 91.0
+offset_bottom = 172.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5vw27")
 
-[node name="OrgTypesLabel" type="Label" parent="UserInterface/VBoxContainer3"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="UserInterface/PanelContainer"]
+layout_mode = 2
+
+[node name="OrgTypesLabel" type="Label" parent="UserInterface/PanelContainer/VBoxContainer3"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="UserInterface"]
+visible = false
 anchors_preset = -1
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -220,8 +348,13 @@ offset_top = 48.0
 offset_right = 20.0
 offset_bottom = 71.0
 grow_horizontal = 2
+theme_override_constants/outline_size = 20
 theme_override_font_sizes/font_size = 36
 text = "DAY 0"
+
+[node name="FatigueTimer" type="Timer" parent="."]
+wait_time = 300.0
+one_shot = true
 
 [connection signal="list_organism_spawned" from="." to="." method="_on_list_organism_spawned"]
 [connection signal="organism_death" from="." to="." method="_on_organism_death"]

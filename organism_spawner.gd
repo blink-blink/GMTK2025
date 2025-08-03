@@ -37,4 +37,10 @@ func _process(delta: float) -> void:
 
 func spawn(organism : Organism) -> void:
 	organism_to_spawn = organism
+	for c : Node2D in sprite_preview.get_children(): c.queue_free()
+	
+	var o_preview : Node2D = organism_to_spawn.duplicate()
+	o_preview.position = Vector2.ZERO
+	o_preview.rotation = 0
+	sprite_preview.add_child(o_preview)
 	show()
